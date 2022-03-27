@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math"
 	"math/rand"
 	"os"
 	"strconv"
@@ -30,8 +29,30 @@ func main() {
 		log.Fatal(err)
 	}
 
-	b := rand.Int63n(p)
+	b := rand.Int63n(p-1) + 1
+	var B, i int64
+	B = 1
+	for i = 0; i < b; i++ {
+		B = (B * g) % p
+	}
 
-	B := int64(math.Pow(float64(g), float64(b))) % p
-	fmt.Println(B)
+	fmt.Println("OK")
+
+	s, err = reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	input = strings.Split(strings.Split(s, "\n")[0], " ")
+	A, err := strconv.ParseInt(input[2], 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var S int64
+	S = 1
+	for i = 0; i < b; i++ {
+		S = (S * A) % p
+	}
+	fmt.Println("B is", B)
 }
