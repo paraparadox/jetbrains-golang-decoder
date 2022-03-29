@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+
+	// Reading g and p
 	reader := bufio.NewReader(os.Stdin)
 	s, err := reader.ReadString('\n')
 	if err != nil {
@@ -29,6 +31,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Generating b and computing B
 	b := rand.Int63n(p-1) + 1
 	var B, i int64
 	B = 1
@@ -43,12 +46,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Reading A
 	input = strings.Split(strings.Split(s, "\n")[0], " ")
 	A, err := strconv.ParseInt(input[2], 10, 64)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Computing the secret
 	var S int64
 	S = 1
 	for i = 0; i < b; i++ {
@@ -60,18 +65,27 @@ func main() {
 	// [65; 90] A-Z
 	// [97; 122] a-z
 
+	// Encoding and printing the question
 	message := "Will you marry me?"
 	encryptedMessage := make([]byte, len(message))
 	for i = 0; i < int64(len(message)); i++ {
-		if int(message[i]) > 64 && int(message[i]) < 91 {
-			encryptedMessage[i] = byte((int64(message[i]) + S) % 91 + 65)
-		} else if int(message[i]) > 96 && int(message[i]) < 123 {
-			encryptedMessage[i] = byte((int64(message[i]) + S) % 123 + 97)
+		if int(message[i]) >= 65 && int(message[i]) <= 90 {
+			encryptedMessage[i] = byte(int64(message[i]) + S)
+			if encryptedMessage[i] > 90 {
+				encryptedMessage[i] -= 26
+			}
+		} else if int(message[i]) >= 97 && int(message[i]) <= 122 {
+			encryptedMessage[i] = byte(int64(message[i]) + S)
+			if encryptedMessage[i] > 122 {
+				encryptedMessage[i] -= 26
+			}
 		} else {
 			encryptedMessage[i] = message[i]
 		}
 	}
-	fmt.Println(encryptedMessage, string(encryptedMessage[:]))
+	fmt.Println(string(encryptedMessage[:]))
+
+	// Reading and decoding the answer
 	message, err = reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err)
@@ -79,13 +93,50 @@ func main() {
 	message = strings.Split(message, "\n")[0]
 	decryptedMessage := make([]byte, len(message))
 	for i = 0; i < int64(len(message)); i++ {
-		if int(message[i]) > 64 && int(message[i]) < 91 {
-			encryptedMessage[i] = byte(int64(message[i]) - 65 + 91)
-		} else if int(message[i]) > 96 && int(message[i]) < 123  {
-			encryptedMessage[i] = byte(int64(message[i]) - 97 + 123)
+		if int(message[i]) >= 65 && int(message[i]) <= 90 {
+			decryptedMessage[i] = byte(int64(message[i]) - S)
+			if decryptedMessage[i] < 65 {
+				decryptedMessage[i] += 26
+			}
+		} else if int(message[i]) >= 97 && int(message[i]) <= 122 {
+			decryptedMessage[i] = byte(int64(message[i]) - S)
+			if decryptedMessage[i] < 97 {
+				decryptedMessage[i] += 26
+			}
 		} else {
-			encryptedMessage[i] = message[i]
+			decryptedMessage[i] = message[i]
 		}
 	}
-	fmt.Println(string(decryptedMessage[:]))
+	answer := string(decryptedMessage[:])
+
+	// Checking the decoded answer
+	if answer == "Yeah, okay!" {
+		message = "Great!"
+	} else if answer == "Let's be friends." {
+		message = "What a pity!"
+	} else {
+		message = ""
+	}
+
+	if message != "" {
+		// Encoding and printing response
+		encryptedMessage = nil
+		encryptedMessage = make([]byte, len(message))
+		for i = 0; i < int64(len(message)); i++ {
+			if int(message[i]) >= 65 && int(message[i]) <= 90 {
+				encryptedMessage[i] = byte(int64(message[i]) + S)
+				if encryptedMessage[i] > 90 {
+					encryptedMessage[i] -= 26
+				}
+			} else if int(message[i]) >= 97 && int(message[i]) <= 122 {
+				encryptedMessage[i] = byte(int64(message[i]) + S)
+				if encryptedMessage[i] > 122 {
+					encryptedMessage[i] -= 26
+				}
+			} else {
+				encryptedMessage[i] = message[i]
+			}
+		}
+		fmt.Println(string(encryptedMessage[:]))
+	}
 }
